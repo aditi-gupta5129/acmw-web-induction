@@ -15,6 +15,9 @@ function addTask() {
         list.appendChild(task);
         checkbox.addEventListener("change", function() {
         task.classList.toggle("completed");
+            if (checkbox.checked) {
+            list.appendChild(task);
+            }
         });
     }
 
