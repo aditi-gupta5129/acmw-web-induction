@@ -4,11 +4,18 @@ const list = document.getElementById("taskList");
 
 function addTask() {
     if (input.value.trim() !== "") {
-        const task = document.createElement("li");
+       const task = document.createElement("li");
 
-        task.textContent = input.value.trim();
+        const checkbox = document.createElement("input");
+        checkbox.type = "checkbox";
+
+        task.appendChild(checkbox);
+        task.appendChild(document.createTextNode(input.value.trim()));
 
         list.appendChild(task);
+        checkbox.addEventListener("change", function() {
+        task.classList.toggle("completed");
+        });
     }
 
     input.value = "";

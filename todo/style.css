@@ -1,0 +1,8 @@
+#taskList {
+    list-style: none;
+}
+.completed {
+    text-decoration: line-through;
+    text-decoration-color: rgb(168, 156, 156);
+    color: rgb(168, 156, 156);
+}
