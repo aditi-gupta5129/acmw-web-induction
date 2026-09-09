@@ -36,6 +36,29 @@ function getWeatherCondition(code) {
     }
 }
 
+
+function changeBackground(code) {
+
+    document.body.className = "";
+
+    if (code === 0) {
+        document.body.classList.add("sunny");
+
+    } else if (code === 1 || code === 2 || code === 3) {
+        document.body.classList.add("cloudy");
+
+    } else if ((code >= 51 && code <= 67) || (code >= 80 && code <= 82)) {
+        document.body.classList.add("rainy");
+
+    } else if (code >= 71 && code <= 77) {
+        document.body.classList.add("snowy");
+
+    } else if (code >= 95) {
+        document.body.classList.add("thunderstorm");
+    }
+}
+
+
 function convertTemperature(temp) {
 
     if (currentUnit === "C") {
@@ -91,7 +114,7 @@ searchBtn.addEventListener("click", async function() {
         const humidityValue = currentWeather.relative_humidity_2m;
         const windSpeed = currentWeather.wind_speed_10m;
         const weatherCode = currentWeather.weather_code;
-
+        changeBackground(weatherCode);
         const weatherCondition = getWeatherCondition(weatherCode);
 
         cityName.textContent = locationData.results[0].name;
