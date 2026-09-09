@@ -7,32 +7,43 @@ const condition = document.getElementById("condition");
 const humidity = document.getElementById("humidity");
 const wind = document.getElementById("wind");
 const error = document.getElementById("error");
+const loading = document.getElementById("loading");
+const unitToggle = document.getElementById("unitToggle");
 
+let currentTemperature = null;
+let currentUnit = "C";
 
 function getWeatherCondition(code) {
 
     if (code === 0) {
-        return "Clear";
+        return "Clear☀️";
     } else if (code === 1 || code === 2) {
-        return "Partly Cloudy";
+        return "Partly Cloudy⛅";
     } else if (code === 3) {
-        return "Cloudy";
+        return "Cloudy☁️";
     } else if (code >= 51 && code <= 57) {
-        return "Drizzle";
+        return "Drizzle🌦️";
     } else if (code >= 61 && code <= 67) {
-        return "Rain";
+        return "Rain🌧️";
     } else if (code >= 71 && code <= 77) {
-        return "Snow";
+        return "Snow❄️";
     } else if (code >= 80 && code <= 82) {
-        return "Rain Showers";
+        return "Rain Showers🌧️";
     } else if (code >= 95) {
-        return "Thunderstorm";
+        return "Thunderstorm⛈️";
     } else {
-        return "Unknown";
+        return "Unknown🌡️";
     }
 }
 
+function convertTemperature(temp) {
 
+    if (currentUnit === "C") {
+        return temp;
+    } else {
+        return (temp * 9 / 5) + 32;
+    }
+}
 searchBtn.addEventListener("click", async function() {
 
     const city = cityInput.value;
@@ -43,6 +54,8 @@ searchBtn.addEventListener("click", async function() {
     }
 
     error.textContent = "";
+    loading.textContent = "Loading...";
+    searchBtn.disabled = true;
 
     try {
 
@@ -52,7 +65,10 @@ searchBtn.addEventListener("click", async function() {
 
         const locationData = await locationResponse.json();
 
-        if (!locationData.results) {
+        if (!locationData.results || locationData.results.length === 0) {
+            loading.textContent = "";
+            searchBtn.disabled = false;
+
             error.textContent = "City not found. Please enter a valid city.";
             return;
         }
@@ -66,24 +82,54 @@ searchBtn.addEventListener("click", async function() {
 
         const weatherData = await weatherResponse.json();
 
+        loading.textContent = "";
+        searchBtn.disabled = false;
+
         const currentWeather = weatherData.current;
 
-        const temp = currentWeather.temperature_2m;
+        currentTemperature = currentWeather.temperature_2m;
         const humidityValue = currentWeather.relative_humidity_2m;
         const windSpeed = currentWeather.wind_speed_10m;
         const weatherCode = currentWeather.weather_code;
 
         const weatherCondition = getWeatherCondition(weatherCode);
 
-        cityName.textContent = city;
-        temperature.textContent = `Temperature: ${temp}°C`;
+        cityName.textContent = locationData.results[0].name;
+        const displayedTemperature = convertTemperature(currentTemperature);
+
+        temperature.textContent = `Temperature: ${displayedTemperature.toFixed(1)}°${currentUnit}`;
         condition.textContent = `Condition: ${weatherCondition}`;
         humidity.textContent = `Humidity: ${humidityValue}%`;
         wind.textContent = `Wind Speed: ${windSpeed} km/h`;
 
-    } catch (err) {
+        } catch (err) {
+
+        loading.textContent = "";
+        searchBtn.disabled = false;
 
         error.textContent = "Something went wrong. Please try again.";
-
     }
-});
+
+});  // closes searchBtn event listener
+
+
+unitToggle.addEventListener("click", function() {
+
+    if (currentTemperature === null) {
+        return;
+    }
+
+    if (currentUnit === "C") {
+        currentUnit = "F";
+        unitToggle.textContent = "Switch to °C";
+    } else {
+        currentUnit = "C";
+        unitToggle.textContent = "Switch to °F";
+    }
+
+    const displayedTemperature = convertTemperature(currentTemperature);
+
+    temperature.textContent =
+        `Temperature: ${displayedTemperature.toFixed(1)}°${currentUnit}`;
+
+});  
